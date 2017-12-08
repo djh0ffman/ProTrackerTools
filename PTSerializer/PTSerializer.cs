@@ -27,11 +27,11 @@ namespace PTSerializer
                 var sample = new Sample();
 
                 sample.Name = reader.ReadAscii(22);
-                sample.Length = reader.ReadInt16()*2;
+                sample.Length = reader.ReadUInt16()*2;
                 sample.FineTune = reader.ReadSByte();
                 sample.Volume = reader.ReadByte();
-                sample.RepeatStart = reader.ReadInt16()*2;
-                sample.RepeatLength = reader.ReadInt16()*2;
+                sample.RepeatStart = reader.ReadUInt16() * 2;
+                sample.RepeatLength = reader.ReadUInt16() * 2;
                 
                 mod.Samples[i] = sample;
             }

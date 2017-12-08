@@ -31,7 +31,6 @@ namespace PTSerializer
             Array.Reverse(data);
             this.Write(data[2]);
             this.Write(data[3]);
-        }
-       
+        }       
     }
 }

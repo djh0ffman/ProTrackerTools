@@ -35,7 +35,7 @@ namespace OptiMod
                     lblName.Text = _mod.Name;
                     RefreshDisplay();
                     _fileName = Path.GetFileName(ofd.FileName);
-                    lblPatternsA.Text = string.Format("Patterns used: {0}", _mod.Patterns.Count + 1);
+                    lblPatternsA.Text = string.Format("Patterns used: {0}", _mod.Patterns.Count);
                     lblSizeA.Text = string.Format("Size: {0}", new FileInfo(ofd.FileName).Length);
  
                     btnFullOptimse.Enabled = true;
@@ -50,7 +50,7 @@ namespace OptiMod
             }
             catch (Exception e)
             {
-                MessageBox.Show(string.Format("Error loading module: ", e.Message));
+                MessageBox.Show(string.Format("Error loading module: {0}", e.Message));
             }
         }
 
