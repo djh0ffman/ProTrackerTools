@@ -10,5 +10,5 @@ Class library for serializing and deserializing a ProTracker binary module
 Basic console app which demonstrates how to serialize and deserialize a module
 
 ## OptiMod
-Front end for the moduling optimisation and tools
+Front end for the tools set which allows for loading, optimisation and saving ProTracker modules
 
