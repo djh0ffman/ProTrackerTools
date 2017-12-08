@@ -1,4 +1,4 @@
-## ProTrackerTools
+### ProTrackerTools
 by Hoffman aka Ian Ford / Logicoma
 
 A set of tools written in C# for the Amiga ProTracker file format.
