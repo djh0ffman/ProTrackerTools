@@ -152,7 +152,34 @@ namespace OptiMod
         {
             try
             {
-                MessageBox.Show("soon");
+                var ofd = new OpenFileDialog();
+                ofd.Filter = "All Files|*.*";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    if (new FileInfo(ofd.FileName).Length > 4000)
+                    {
+                        MessageBox.Show("You are having a laugh right?");
+                    }
+                    else
+                    {
+                        var ascii = File.ReadAllLines(ofd.FileName);
+                        for (var i = 0; i < 31; i++)
+                        {
+                            if (ascii.Length > i)
+                            {
+                                if (ascii[i].Length > 22)
+                                    _mod.Samples[i].Name = ascii[i].Substring(0, 22);
+                                else
+                                    _mod.Samples[i].Name = ascii[i];
+                            }
+                            else
+                            {
+                                _mod.Samples[i].Name = "";
+                            }
+                        }
+                    }
+                }
+                RefreshDisplay();
             }
             catch (Exception e)
             {
