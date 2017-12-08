@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PTSerializer
 {
@@ -28,6 +23,9 @@ namespace PTSerializer
             Patterns = new List<Pattern>();
         }
 
+        /// <summary>
+        /// Removes unwanted data after the loop end point
+        /// </summary>
         public void OptimseLoopedSamples()
         {
             foreach (var sample in this.Samples)
@@ -44,7 +42,10 @@ namespace PTSerializer
             }
         }
 
-        public void RemoteUnusedSamples()
+        /// <summary>
+        /// Removes any samples which have not been used in the pattern data
+        /// </summary>
+        public void RemoveUnusedSamples()
         {
             // find all used samples
             var used = new bool[32];
@@ -73,6 +74,24 @@ namespace PTSerializer
             }
         }
 
+        /// <summary>
+        /// Clears the first two bytes of each single shot sample for people who don't use a proper tracker
+        /// </summary>
+        public void ZeroLeadingSamples()
+        {
+            foreach (var sample in Samples)
+            {
+                if (sample.Length > 2 && sample.RepeatLength == 2 && sample.RepeatStart == 0)
+                {
+                    sample.Data[0] = 0;
+                    sample.Data[1] = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears patterns after song end point and removes and sanitizes the remaining patterns
+        /// </summary>
         public void RemoveUnusedPatterns()
         {
             // zero out anything after song end
@@ -125,6 +144,9 @@ namespace PTSerializer
             Patterns = newPatterns;
         }
 
+        /// <summary>
+        /// Compares all patterns to remove and the remaps any duplicates
+        /// </summary>
         public void RemoveDuplicatePatterns()
         {
             for (var a = 0; a < Patterns.Count; a++)

@@ -1,6 +1,6 @@
 ﻿namespace OptiMod
 {
-    partial class Form1
+    partial class OptiMod
     {
         /// <summary>
         /// Required designer variable.
@@ -47,11 +47,13 @@
             this.lblPatternsB = new System.Windows.Forms.Label();
             this.lblSizeB = new System.Windows.Forms.Label();
             this.btnFullOptimse = new System.Windows.Forms.Button();
+            this.btnZeroLeadingSamples = new System.Windows.Forms.Button();
+            this.btnImportASCII = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(673, 7);
+            this.btnOpen.Location = new System.Drawing.Point(600, 12);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(75, 23);
             this.btnOpen.TabIndex = 0;
@@ -62,7 +64,7 @@
             // btnSave
             // 
             this.btnSave.Enabled = false;
-            this.btnSave.Location = new System.Drawing.Point(673, 41);
+            this.btnSave.Location = new System.Drawing.Point(600, 46);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 0;
@@ -88,9 +90,10 @@
             this.Length,
             this.RepStart,
             this.RepLen});
+            this.lvwSamples.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lvwSamples.Location = new System.Drawing.Point(12, 78);
             this.lvwSamples.Name = "lvwSamples";
-            this.lvwSamples.Size = new System.Drawing.Size(563, 562);
+            this.lvwSamples.Size = new System.Drawing.Size(492, 562);
             this.lvwSamples.TabIndex = 2;
             this.lvwSamples.UseCompatibleStateImageBehavior = false;
             this.lvwSamples.View = System.Windows.Forms.View.Details;
@@ -98,7 +101,7 @@
             // Sample
             // 
             this.Sample.Text = "Sample";
-            this.Sample.Width = 227;
+            this.Sample.Width = 174;
             // 
             // Volume
             // 
@@ -128,7 +131,7 @@
             // btnOptimiseSampleLengths
             // 
             this.btnOptimiseSampleLengths.Enabled = false;
-            this.btnOptimiseSampleLengths.Location = new System.Drawing.Point(590, 218);
+            this.btnOptimiseSampleLengths.Location = new System.Drawing.Point(517, 223);
             this.btnOptimiseSampleLengths.Name = "btnOptimiseSampleLengths";
             this.btnOptimiseSampleLengths.Size = new System.Drawing.Size(158, 23);
             this.btnOptimiseSampleLengths.TabIndex = 3;
@@ -139,13 +142,13 @@
             // btnRemoveUnusedPatterns
             // 
             this.btnRemoveUnusedPatterns.Enabled = false;
-            this.btnRemoveUnusedPatterns.Location = new System.Drawing.Point(590, 131);
+            this.btnRemoveUnusedPatterns.Location = new System.Drawing.Point(517, 136);
             this.btnRemoveUnusedPatterns.Name = "btnRemoveUnusedPatterns";
             this.btnRemoveUnusedPatterns.Size = new System.Drawing.Size(158, 23);
             this.btnRemoveUnusedPatterns.TabIndex = 3;
             this.btnRemoveUnusedPatterns.Text = "Remove Unsed Patterns";
             this.btnRemoveUnusedPatterns.UseVisualStyleBackColor = true;
-            this.btnRemoveUnusedPatterns.Click += new System.EventHandler(this.button1_Click);
+            this.btnRemoveUnusedPatterns.Click += new System.EventHandler(this.btnRemoveUnusedPatterns_Click);
             // 
             // lblPatternsA
             // 
@@ -159,7 +162,7 @@
             // btnRemoveUnsedSamples
             // 
             this.btnRemoveUnsedSamples.Enabled = false;
-            this.btnRemoveUnsedSamples.Location = new System.Drawing.Point(590, 189);
+            this.btnRemoveUnsedSamples.Location = new System.Drawing.Point(517, 194);
             this.btnRemoveUnsedSamples.Name = "btnRemoveUnsedSamples";
             this.btnRemoveUnsedSamples.Size = new System.Drawing.Size(158, 23);
             this.btnRemoveUnsedSamples.TabIndex = 3;
@@ -170,7 +173,7 @@
             // btnRemoveDupePatterns
             // 
             this.btnRemoveDupePatterns.Enabled = false;
-            this.btnRemoveDupePatterns.Location = new System.Drawing.Point(590, 160);
+            this.btnRemoveDupePatterns.Location = new System.Drawing.Point(517, 165);
             this.btnRemoveDupePatterns.Name = "btnRemoveDupePatterns";
             this.btnRemoveDupePatterns.Size = new System.Drawing.Size(158, 23);
             this.btnRemoveDupePatterns.TabIndex = 3;
@@ -208,7 +211,7 @@
             // btnFullOptimse
             // 
             this.btnFullOptimse.Enabled = false;
-            this.btnFullOptimse.Location = new System.Drawing.Point(590, 78);
+            this.btnFullOptimse.Location = new System.Drawing.Point(517, 83);
             this.btnFullOptimse.Name = "btnFullOptimse";
             this.btnFullOptimse.Size = new System.Drawing.Size(158, 23);
             this.btnFullOptimse.TabIndex = 3;
@@ -216,11 +219,33 @@
             this.btnFullOptimse.UseVisualStyleBackColor = true;
             this.btnFullOptimse.Click += new System.EventHandler(this.btnFullOptimse_Click);
             // 
-            // Form1
+            // btnZeroLeadingSamples
+            // 
+            this.btnZeroLeadingSamples.Enabled = false;
+            this.btnZeroLeadingSamples.Location = new System.Drawing.Point(518, 252);
+            this.btnZeroLeadingSamples.Name = "btnZeroLeadingSamples";
+            this.btnZeroLeadingSamples.Size = new System.Drawing.Size(158, 23);
+            this.btnZeroLeadingSamples.TabIndex = 3;
+            this.btnZeroLeadingSamples.Text = "Zero Leading Samples";
+            this.btnZeroLeadingSamples.UseVisualStyleBackColor = true;
+            this.btnZeroLeadingSamples.Click += new System.EventHandler(this.btnZeroLeadingSamples_Click);
+            // 
+            // btnImportASCII
+            // 
+            this.btnImportASCII.Enabled = false;
+            this.btnImportASCII.Location = new System.Drawing.Point(517, 311);
+            this.btnImportASCII.Name = "btnImportASCII";
+            this.btnImportASCII.Size = new System.Drawing.Size(158, 23);
+            this.btnImportASCII.TabIndex = 3;
+            this.btnImportASCII.Text = "Import ASCII Sample Names";
+            this.btnImportASCII.UseVisualStyleBackColor = true;
+            this.btnImportASCII.Click += new System.EventHandler(this.btnImportASCII_Click);
+            // 
+            // OptiMod
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(761, 652);
+            this.ClientSize = new System.Drawing.Size(688, 652);
             this.Controls.Add(this.lblSizeB);
             this.Controls.Add(this.lblSizeA);
             this.Controls.Add(this.lblPatternsB);
@@ -228,16 +253,16 @@
             this.Controls.Add(this.btnRemoveDupePatterns);
             this.Controls.Add(this.btnRemoveUnsedSamples);
             this.Controls.Add(this.btnRemoveUnusedPatterns);
+            this.Controls.Add(this.btnImportASCII);
             this.Controls.Add(this.btnFullOptimse);
+            this.Controls.Add(this.btnZeroLeadingSamples);
             this.Controls.Add(this.btnOptimiseSampleLengths);
             this.Controls.Add(this.lvwSamples);
             this.Controls.Add(this.lblName);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnOpen);
-            this.MaximumSize = new System.Drawing.Size(777, 690);
-            this.MinimumSize = new System.Drawing.Size(777, 690);
-            this.Name = "Form1";
-            this.Text = "Opti-Mod";
+            this.Name = "OptiMod";
+            this.Text = "OptiMod";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -264,6 +289,8 @@
         private System.Windows.Forms.Label lblPatternsB;
         private System.Windows.Forms.Label lblSizeB;
         private System.Windows.Forms.Button btnFullOptimse;
+        private System.Windows.Forms.Button btnZeroLeadingSamples;
+        private System.Windows.Forms.Button btnImportASCII;
     }
 }
 

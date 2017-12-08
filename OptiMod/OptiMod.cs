@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlTypes;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using PTSerializer;
 
 namespace OptiMod
 {
-    public partial class Form1 : Form
+    public partial class OptiMod : Form
     {
         private Module _mod;
         private string _fileName;
 
-        public Form1()
+        public OptiMod()
         {
             InitializeComponent();
         }
@@ -41,7 +35,7 @@ namespace OptiMod
                     lblName.Text = _mod.Name;
                     RefreshDisplay();
                     _fileName = Path.GetFileName(ofd.FileName);
-                    lblPatternsA.Text = string.Format("Patterns used: {0}", _mod.SongPositions.Max() + 1);
+                    lblPatternsA.Text = string.Format("Patterns used: {0}", _mod.Patterns.Count + 1);
                     lblSizeA.Text = string.Format("Size: {0}", new FileInfo(ofd.FileName).Length);
  
                     btnFullOptimse.Enabled = true;
@@ -50,6 +44,8 @@ namespace OptiMod
                     btnRemoveUnsedSamples.Enabled = true;
                     btnRemoveUnusedPatterns.Enabled = true;
                     btnSave.Enabled = true;
+                    btnZeroLeadingSamples.Enabled = true;
+                    btnImportASCII.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -66,7 +62,7 @@ namespace OptiMod
                 lvwSamples.Items.Add(GetSampleDetail(sample));
             }
 
-            lblPatternsB.Text = string.Format("Patterns used: {0}", _mod.SongPositions.Max() + 1);
+            lblPatternsB.Text = string.Format("Patterns used: {0}", _mod.Patterns.Count);
             var ser = new PTSerializer.PTSerializer();
             var data = ser.SerializeMod(_mod);
             lblSizeB.Text = string.Format("Size: {0}", data.Length);
@@ -86,23 +82,7 @@ namespace OptiMod
 
         private void btnOptiLength_Click(object sender, EventArgs e)
         {
-            OptimiseSampleLenghts();
-        }
-
-        private void OptimiseSampleLenghts()
-        {
             _mod.OptimseLoopedSamples();
-            RefreshDisplay();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            RemoveUnsedPatterns();
-        }
-
-        private void RemoveUnsedPatterns()
-        {
-            _mod.RemoveUnusedPatterns();
             RefreshDisplay();
         }
 
@@ -113,32 +93,29 @@ namespace OptiMod
 
         private void SaveMod()
         {
-            var sfd = new SaveFileDialog();
-            sfd.FileName = _fileName;
-            if (sfd.ShowDialog() == DialogResult.OK)
+            try
             {
-                var ser = new PTSerializer.PTSerializer();
-                File.WriteAllBytes(sfd.FileName, ser.SerializeMod(_mod));
+                var sfd = new SaveFileDialog();
+                sfd.FileName = _fileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    var ser = new PTSerializer.PTSerializer();
+                    File.WriteAllBytes(sfd.FileName, ser.SerializeMod(_mod));
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Whoops: {0}", e.Message));
             }
         }
 
         private void btnRemoveUnsedSamples_Click(object sender, EventArgs e)
         {
-            RemoveUnusedSamples();
-        }
-
-        private void RemoveUnusedSamples()
-        {
-            _mod.RemoteUnusedSamples();
+            _mod.RemoveUnusedSamples();
             RefreshDisplay();
         }
 
         private void btnRemoveDupePatterns_Click(object sender, EventArgs e)
-        {
-            RemoveDupePatterns();
-        }
-
-        private void RemoveDupePatterns()
         {
             _mod.RemoveDuplicatePatterns();
             RefreshDisplay();
@@ -146,10 +123,41 @@ namespace OptiMod
 
         private void btnFullOptimse_Click(object sender, EventArgs e)
         {
-            RemoveUnsedPatterns();
-            RemoveDupePatterns();
-            RemoveUnusedSamples();
-            OptimiseSampleLenghts();
+            _mod.RemoveUnusedPatterns();
+            _mod.RemoveDuplicatePatterns();
+            _mod.RemoveUnusedSamples();
+            _mod.OptimseLoopedSamples();
+            _mod.ZeroLeadingSamples();
+            RefreshDisplay();
+        }
+
+        private void btnZeroLeadingSamples_Click(object sender, EventArgs e)
+        {
+            _mod.ZeroLeadingSamples();
+            Refresh();
+        }
+
+        private void btnRemoveUnusedPatterns_Click(object sender, EventArgs e)
+        {
+            _mod.RemoveUnusedPatterns();
+            RefreshDisplay();
+        }
+
+        private void btnImportASCII_Click(object sender, EventArgs e)
+        {
+            ImportASCII();
+        }
+
+        private void ImportASCII()
+        {
+            try
+            {
+                MessageBox.Show("soon");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Whoops: ", e.Message));
+            }
         }
     }
 }
