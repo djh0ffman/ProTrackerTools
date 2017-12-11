@@ -200,6 +200,26 @@ namespace PTSerializer
             }
             return -1;
         }
+
+        /// <summary>
+        /// Truncates a sample to the loop contents only, returns true if successful
+        /// </summary>
+        /// <param name="sampleId"></param>
+        public bool TruncateToLoop(int sampleId)
+        {
+            var sample = Samples[sampleId];
+            if (sample.RepeatLength > 2 && sample.RepeatStart > 2)
+            {
+                sample.Data = sample.Data.Skip(sample.RepeatStart - 2).ToArray().Take(sample.RepeatLength + 2).ToArray();
+                sample.Length = sample.Data.Length;
+                sample.RepeatStart = 2;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
     public class Sample

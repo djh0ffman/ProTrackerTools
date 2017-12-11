@@ -46,6 +46,7 @@ namespace OptiMod
                     btnSave.Enabled = true;
                     btnZeroLeadingSamples.Enabled = true;
                     btnImportASCII.Enabled = true;
+                    btnTruncateToLoop.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -185,6 +186,34 @@ namespace OptiMod
             {
                 MessageBox.Show(string.Format("Whoops: ", e.Message));
             }
+        }
+
+        private void btnTruncateToLoop_Click(object sender, EventArgs e)
+        {
+            if (lvwSamples.SelectedIndices.Count == 0)
+            {
+                MessageBox.Show("Select at least one sample first");
+                return;
+            }
+
+            var samples = "Are you sure you want to truncate the following samples to loop data only?\n\n";
+            foreach (int i in lvwSamples.SelectedIndices)
+            {
+                samples += lvwSamples.Items[i].Text.Replace("\0","") + "\n";
+            }
+
+            if (MessageBox.Show(samples, "Are you sure?", MessageBoxButtons.OKCancel) == DialogResult.OK)
+            {
+                foreach (int i in lvwSamples.SelectedIndices)
+                {
+                    if (!_mod.TruncateToLoop(i))
+                    {
+                        MessageBox.Show(string.Format("Unable to truncate {0}", _mod.Samples[i].Name));
+                    }
+                }
+            }
+
+            RefreshDisplay();
         }
     }
 }

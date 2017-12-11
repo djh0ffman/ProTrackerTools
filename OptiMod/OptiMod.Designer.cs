@@ -49,6 +49,7 @@
             this.btnFullOptimse = new System.Windows.Forms.Button();
             this.btnZeroLeadingSamples = new System.Windows.Forms.Button();
             this.btnImportASCII = new System.Windows.Forms.Button();
+            this.btnTruncateToLoop = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOpen
@@ -233,13 +234,24 @@
             // btnImportASCII
             // 
             this.btnImportASCII.Enabled = false;
-            this.btnImportASCII.Location = new System.Drawing.Point(517, 311);
+            this.btnImportASCII.Location = new System.Drawing.Point(517, 331);
             this.btnImportASCII.Name = "btnImportASCII";
             this.btnImportASCII.Size = new System.Drawing.Size(158, 23);
             this.btnImportASCII.TabIndex = 3;
             this.btnImportASCII.Text = "Import ASCII Sample Names";
             this.btnImportASCII.UseVisualStyleBackColor = true;
             this.btnImportASCII.Click += new System.EventHandler(this.btnImportASCII_Click);
+            // 
+            // btnTruncateToLoop
+            // 
+            this.btnTruncateToLoop.Enabled = false;
+            this.btnTruncateToLoop.Location = new System.Drawing.Point(518, 380);
+            this.btnTruncateToLoop.Name = "btnTruncateToLoop";
+            this.btnTruncateToLoop.Size = new System.Drawing.Size(158, 23);
+            this.btnTruncateToLoop.TabIndex = 3;
+            this.btnTruncateToLoop.Text = "Truncate Sample To Loop";
+            this.btnTruncateToLoop.UseVisualStyleBackColor = true;
+            this.btnTruncateToLoop.Click += new System.EventHandler(this.btnTruncateToLoop_Click);
             // 
             // OptiMod
             // 
@@ -255,6 +267,7 @@
             this.Controls.Add(this.btnRemoveUnusedPatterns);
             this.Controls.Add(this.btnImportASCII);
             this.Controls.Add(this.btnFullOptimse);
+            this.Controls.Add(this.btnTruncateToLoop);
             this.Controls.Add(this.btnZeroLeadingSamples);
             this.Controls.Add(this.btnOptimiseSampleLengths);
             this.Controls.Add(this.lvwSamples);
@@ -291,6 +304,7 @@
         private System.Windows.Forms.Button btnFullOptimse;
         private System.Windows.Forms.Button btnZeroLeadingSamples;
         private System.Windows.Forms.Button btnImportASCII;
+        private System.Windows.Forms.Button btnTruncateToLoop;
     }
 }
 
