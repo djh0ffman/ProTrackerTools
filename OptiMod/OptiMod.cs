@@ -148,6 +148,7 @@ namespace OptiMod
         private void btnImportASCII_Click(object sender, EventArgs e)
         {
             ImportASCII();
+            RefreshDisplay();
         }
 
         private void ImportASCII()
@@ -220,6 +221,7 @@ namespace OptiMod
         private void btnExpandLoops_Click(object sender, EventArgs e)
         {
             _mod.ExpandPatternLoops();
+            RefreshDisplay();
         }
     }
 }

@@ -223,7 +223,7 @@ namespace PTSerializer
         }
 
         /// <summary>
-        /// Expands all E6 loop commands and removes loops
+        /// Expands all patterns which may contain E6 loops
         /// </summary>
         /// <returns></returns>
         public bool ExpandPatternLoops()
@@ -233,9 +233,12 @@ namespace PTSerializer
             {
                 var pat = Patterns[patIndex];
 
-                var expanded = ExpandPattern(patIndex);
-                if (expanded.Count > 1)
+                if (ContainsPatterLoop(pat))
                 {
+                    // create expanded pattern
+                    var expanded = ExpandPattern(patIndex);
+
+                    // add new patterns to Mod and generate Ids
                     var patIdList = new List<int>();
                     foreach (var newPat in expanded)
                     {
@@ -245,8 +248,8 @@ namespace PTSerializer
 
                     var sourcePatId = Patterns.IndexOf(pat);
 
+                    // re-map patterns in the song
                     var songPos = new List<int>();
-
                     for (var i = 0; i < SongLength; i++)
                     {
                         var patId = SongPositions[i];
@@ -280,6 +283,36 @@ namespace PTSerializer
             return true;
         }
 
+        private bool ContainsPatterLoop(Pattern pattern)
+        {
+            foreach (var chan in pattern.Channels)
+            {
+                bool loopFound = false;
+                foreach (var item in chan.PatternItems)
+                {
+                    if (item.Command == CommandType.Extended && (item.CommandValue & 0xF0) == 0x60)
+                    {
+
+                        if ((item.CommandValue & 0x0F) == 0)
+                        {
+                            loopFound = true;
+                        }
+
+                        if ((item.CommandValue & 0x0F) > 0 && loopFound)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates multiple patterns where E6 loops are present
+        /// </summary>
+        /// <returns></returns>
         private List<Pattern> ExpandPattern(int patternId)
         {
             var source = Patterns[patternId];
