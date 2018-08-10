@@ -328,7 +328,8 @@ namespace PTSerializer
                 loops[i] = new PatternLoop();
             }
 
-            for (var lineId = 0; lineId < 64; lineId++)
+            int lineId = 0;
+            while (lineId < 64)
             {
                 for (var chan = 0; chan < 4; chan++)
                 {
@@ -361,9 +362,12 @@ namespace PTSerializer
                     }
                 }
 
+                int loopLineId = -2;
                 // now line is done, check the loops
                 foreach (var loop in loops)
                 {
+
+
                     if (loop.Active && loop.LoopEnd == lineId)
                     {
                         loop.LoopCount--;
@@ -374,14 +378,20 @@ namespace PTSerializer
                         }
                         else
                         {
-                            lineId = loop.LoopStart - 1;
+                            loopLineId = loop.LoopStart - 1;
                         }
                     }
                 }
 
+                // resulted in loop start point, now set
+                if (loopLineId >= -1)
+                    lineId = loopLineId;
+
                 newLineId++;
                 totalLines++;
+                lineId++;
 
+                // current pattern full, add to list and create new
                 if (newLineId > 63)
                 {
                     newPatterns.Add(dest);
