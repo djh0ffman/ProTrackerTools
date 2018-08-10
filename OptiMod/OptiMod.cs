@@ -47,6 +47,7 @@ namespace OptiMod
                     btnZeroLeadingSamples.Enabled = true;
                     btnImportASCII.Enabled = true;
                     btnTruncateToLoop.Enabled = true;
+                    btnExpandLoops.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -147,6 +148,7 @@ namespace OptiMod
         private void btnImportASCII_Click(object sender, EventArgs e)
         {
             ImportASCII();
+            RefreshDisplay();
         }
 
         private void ImportASCII()
@@ -213,6 +215,12 @@ namespace OptiMod
                 }
             }
 
+            RefreshDisplay();
+        }
+
+        private void btnExpandLoops_Click(object sender, EventArgs e)
+        {
+            _mod.ExpandPatternLoops();
             RefreshDisplay();
         }
     }

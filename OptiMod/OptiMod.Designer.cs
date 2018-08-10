@@ -50,6 +50,7 @@
             this.btnZeroLeadingSamples = new System.Windows.Forms.Button();
             this.btnImportASCII = new System.Windows.Forms.Button();
             this.btnTruncateToLoop = new System.Windows.Forms.Button();
+            this.btnExpandLoops = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOpen
@@ -253,6 +254,17 @@
             this.btnTruncateToLoop.UseVisualStyleBackColor = true;
             this.btnTruncateToLoop.Click += new System.EventHandler(this.btnTruncateToLoop_Click);
             // 
+            // btnExpandLoops
+            // 
+            this.btnExpandLoops.Enabled = false;
+            this.btnExpandLoops.Location = new System.Drawing.Point(518, 433);
+            this.btnExpandLoops.Name = "btnExpandLoops";
+            this.btnExpandLoops.Size = new System.Drawing.Size(158, 23);
+            this.btnExpandLoops.TabIndex = 3;
+            this.btnExpandLoops.Text = "Expand Pattern Loops";
+            this.btnExpandLoops.UseVisualStyleBackColor = true;
+            this.btnExpandLoops.Click += new System.EventHandler(this.btnExpandLoops_Click);
+            // 
             // OptiMod
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -266,6 +278,7 @@
             this.Controls.Add(this.btnRemoveUnsedSamples);
             this.Controls.Add(this.btnRemoveUnusedPatterns);
             this.Controls.Add(this.btnImportASCII);
+            this.Controls.Add(this.btnExpandLoops);
             this.Controls.Add(this.btnFullOptimse);
             this.Controls.Add(this.btnTruncateToLoop);
             this.Controls.Add(this.btnZeroLeadingSamples);
@@ -305,6 +318,7 @@
         private System.Windows.Forms.Button btnZeroLeadingSamples;
         private System.Windows.Forms.Button btnImportASCII;
         private System.Windows.Forms.Button btnTruncateToLoop;
+        private System.Windows.Forms.Button btnExpandLoops;
     }
 }
 

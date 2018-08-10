@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PTSerializer
@@ -194,7 +195,7 @@ namespace PTSerializer
 
         private int FindLast(bool state, bool[] blist)
         {
-            for (var i = blist.Length-1; i >= 0; i--)
+            for (var i = blist.Length - 1; i >= 0; i--)
             {
                 if (blist[i] == state) return i;
             }
@@ -220,6 +221,245 @@ namespace PTSerializer
                 return false;
             }
         }
+
+        /// <summary>
+        /// Expands all patterns which may contain E6 loops
+        /// </summary>
+        /// <returns></returns>
+        public void ExpandPatternLoops()
+        {
+            int patCount = Patterns.Count();
+            for (var patIndex = 0; patIndex < patCount; patIndex++)
+            {
+                var pat = Patterns[patIndex];
+
+                if (ContainsPatterLoop(pat))
+                {
+                    // create expanded pattern
+                    var expanded = ExpandPattern(patIndex);
+
+                    // add new patterns to Mod and generate Ids
+                    var patIdList = new List<int>();
+                    foreach (var newPat in expanded)
+                    {
+                        Patterns.Add(newPat);
+                        patIdList.Add(Patterns.IndexOf(newPat));
+                    }
+
+                    var sourcePatId = Patterns.IndexOf(pat);
+
+                    // re-map patterns in the song
+                    var songPos = new List<int>();
+                    for (var i = 0; i < SongLength; i++)
+                    {
+                        var patId = SongPositions[i];
+
+                        if (patId == sourcePatId)
+                        {
+                            songPos.AddRange(patIdList);
+                        }
+                        else
+                        {
+                            songPos.Add(patId);
+                        }
+                    }
+
+                    if (songPos.Count > 128)
+                    {
+                        throw new Exception("Song position overflow");
+                    }
+                    else
+                    {
+                        int index = 0;
+                        foreach (var i in songPos)
+                        {
+                            SongPositions[index] = i;
+                            index++;
+                        }
+                        SongLength = songPos.Count;
+                    }
+                }
+            }
+        }
+
+        private bool ContainsPatterLoop(Pattern pattern)
+        {
+            foreach (var chan in pattern.Channels)
+            {
+                bool loopFound = false;
+                foreach (var item in chan.PatternItems)
+                {
+                    if (item.Command == CommandType.Extended && (item.CommandValue & 0xF0) == 0x60)
+                    {
+
+                        if ((item.CommandValue & 0x0F) == 0)
+                        {
+                            loopFound = true;
+                        }
+
+                        if ((item.CommandValue & 0x0F) > 0 && loopFound)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Creates multiple patterns where E6 loops are present
+        /// </summary>
+        /// <returns></returns>
+        private List<Pattern> ExpandPattern(int patternId)
+        {
+            var source = Patterns[patternId];
+            var newPatterns = new List<Pattern>();
+            var dest = new Pattern();
+
+            int newLineId = 0;
+            int totalLines = 0;
+
+            var loops = new PatternLoop[4];
+            for (var i = 0; i < 4; i++)
+            {
+                loops[i] = new PatternLoop();
+            }
+
+            int lineId = 0;
+            while (lineId < 64)
+            {
+                for (var chan = 0; chan < 4; chan++)
+                {
+                    // create new copy of pattern item
+                    var item = DupePatternItem(source.Channels[chan].PatternItems[lineId]);
+                    dest.Channels[chan].PatternItems[newLineId] = item;
+
+                    if (item.Command == CommandType.Extended && (item.CommandValue & 0xF0) == 0x60)
+                    {
+                        if ((item.CommandValue & 0x0F) == 0)            // set loop start point
+                        {
+                            if (!loops[chan].Active)
+                            {
+                                loops[chan].LoopStart = lineId;
+                                loops[chan].Done = false;
+                            }
+                        }
+                        else if ((item.CommandValue & 0x0F) > 0)        // set loop end point and activate
+                        {
+                            if (!loops[chan].Active && !loops[chan].Done)
+                            {
+                                loops[chan].LoopEnd = lineId;
+                                loops[chan].LoopCount = (item.CommandValue & 0x0F);
+                                loops[chan].Active = true;
+                            }
+                        }
+
+                        item.Command = CommandType.None;
+                        item.CommandValue = 0;
+                    }
+                }
+
+                int loopLineId = -2;
+                // now line is done, check the loops
+                foreach (var loop in loops)
+                {
+                    if (loop.Active && loop.LoopEnd == lineId)
+                    {
+                        loop.LoopCount--;
+                        if (loop.LoopCount < 0)
+                        {
+                            loop.Active = false;
+                            loop.Done = true;
+                        }
+                        else
+                        {
+                            loopLineId = loop.LoopStart - 1;
+                        }
+                    }
+                }
+
+                // resulted in loop start point, now set
+                if (loopLineId >= -1)
+                    lineId = loopLineId;
+
+                newLineId++;
+                totalLines++;
+                lineId++;
+
+                // current pattern full, add to list and create new
+                if (newLineId > 63)
+                {
+                    newPatterns.Add(dest);
+                    dest = new Pattern();
+                    newLineId = 0;
+                }
+            }
+
+            if (newLineId != 0)
+            {
+                // add break command to pattern end
+                bool breakDone = false;
+                foreach (var chan in dest.Channels)
+                {
+                    var lineBreak = chan.PatternItems[newLineId - 1];
+                    if (lineBreak.Command == CommandType.None && lineBreak.CommandValue == 0x00)
+                    {
+                        lineBreak.Command = CommandType.PatternBreak;
+                        breakDone = true;
+                        break;
+                    }
+                }
+
+                if (!breakDone)
+                {
+                    throw new Exception("Unable to find space for pattern break");
+                }
+
+                // clean up pattern tails
+                foreach (var chan in dest.Channels)
+                {
+                    for (var i = 0; i < 64; i++)
+                    {
+                        if (chan.PatternItems[i] == null)
+                        {
+                            chan.PatternItems[i] = new PatternItem()
+                            {
+                                Command = CommandType.None,
+                                CommandValue = 0x00,
+                                Period = 0,
+                                SampleNumber = 0
+                            };
+                        }
+                    } 
+                }
+
+                newPatterns.Add(dest);
+            }
+
+            return newPatterns;
+        }
+
+        private PatternItem DupePatternItem(PatternItem source)
+        {
+            return new PatternItem()
+            {
+                SampleNumber = source.SampleNumber,
+                Period = source.Period,
+                Command = source.Command,
+                CommandValue = source.CommandValue
+            };
+        }
+    }
+
+    class PatternLoop
+    {
+        public int LoopStart { get; set; }
+        public int LoopEnd { get; set; }
+        public int LoopCount { get; set; }
+        public bool Active { get; set; }
+        public bool Done { get; set; }
     }
 
     public class Sample
