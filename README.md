@@ -12,3 +12,4 @@ Basic console app which demonstrates how to serialize and deserialize a module
 ## OptiMod
 Front end for the tools set which allows for loading, optimisation and saving ProTracker modules
 
+Download the current release: https://github.com/djh0ffman/ProTrackerTools/raw/master/BinaryRelease/OptiMod.zip
