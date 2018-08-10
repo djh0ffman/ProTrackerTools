@@ -226,7 +226,7 @@ namespace PTSerializer
         /// Expands all patterns which may contain E6 loops
         /// </summary>
         /// <returns></returns>
-        public bool ExpandPatternLoops()
+        public void ExpandPatternLoops()
         {
             int patCount = Patterns.Count();
             for (var patIndex = 0; patIndex < patCount; patIndex++)
@@ -280,7 +280,6 @@ namespace PTSerializer
                     }
                 }
             }
-            return true;
         }
 
         private bool ContainsPatterLoop(Pattern pattern)
@@ -366,8 +365,6 @@ namespace PTSerializer
                 // now line is done, check the loops
                 foreach (var loop in loops)
                 {
-
-
                     if (loop.Active && loop.LoopEnd == lineId)
                     {
                         loop.LoopCount--;
@@ -400,10 +397,45 @@ namespace PTSerializer
                 }
             }
 
-            // TODO: sort out odd pattern lengths
             if (newLineId != 0)
             {
-                throw new Exception("Hello mate!");
+                // add break command to pattern end
+                bool breakDone = false;
+                foreach (var chan in dest.Channels)
+                {
+                    var lineBreak = chan.PatternItems[newLineId - 1];
+                    if (lineBreak.Command == CommandType.None && lineBreak.CommandValue == 0x00)
+                    {
+                        lineBreak.Command = CommandType.PatternBreak;
+                        breakDone = true;
+                        break;
+                    }
+                }
+
+                if (!breakDone)
+                {
+                    throw new Exception("Unable to find space for pattern break");
+                }
+
+                // clean up pattern tails
+                foreach (var chan in dest.Channels)
+                {
+                    for (var i = 0; i < 64; i++)
+                    {
+                        if (chan.PatternItems[i] == null)
+                        {
+                            chan.PatternItems[i] = new PatternItem()
+                            {
+                                Command = CommandType.None,
+                                CommandValue = 0x00,
+                                Period = 0,
+                                SampleNumber = 0
+                            };
+                        }
+                    } 
+                }
+
+                newPatterns.Add(dest);
             }
 
             return newPatterns;
