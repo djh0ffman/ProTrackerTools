@@ -48,6 +48,7 @@ namespace OptiMod
                     btnImportASCII.Enabled = true;
                     btnTruncateToLoop.Enabled = true;
                     btnExpandLoops.Enabled = true;
+                    btnPadSamples.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -222,6 +223,25 @@ namespace OptiMod
         {
             _mod.ExpandPatternLoops();
             RefreshDisplay();
+        }
+
+        private void btnPadSamples_Click(object sender, EventArgs e)
+        {
+            var sampleSize = 0;
+            try
+            {
+                sampleSize = Convert.ToInt32(txtPadSize.Text);
+            }
+            catch
+            {
+                MessageBox.Show(string.Format("{0} isn't a number", txtPadSize.Text));
+            }
+
+            if (sampleSize > 4)
+            {
+                _mod.PadSamples(sampleSize);
+                RefreshDisplay();
+            }
         }
     }
 }
