@@ -523,6 +523,11 @@ namespace PTSerializer
         public int RepeatStart { get; set; }
         public int RepeatLength { get; set; }
         public byte[] Data { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public class Pattern
