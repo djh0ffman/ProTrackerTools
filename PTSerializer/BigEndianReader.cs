@@ -2,11 +2,11 @@
 using System.IO;
 using System.Text;
 
-namespace PTSerializer
+namespace ProTrackerTools
 {
     public class BigEndianReader : BinaryReader
     {
-        public BigEndianReader(System.IO.Stream stream) : base(stream) { }
+        public BigEndianReader(Stream stream) : base(stream) { }
 
         public override int ReadInt32()
         {
@@ -15,28 +15,28 @@ namespace PTSerializer
             return BitConverter.ToInt32(data, 0);
         }
 
-        public Int16 ReadInt16()
+        public override Int16 ReadInt16()
         {
             var data = base.ReadBytes(2);
             Array.Reverse(data);
             return BitConverter.ToInt16(data, 0);
         }
 
-        public UInt16 ReadUInt16()
+        public override UInt16 ReadUInt16()
         {
             var data = base.ReadBytes(2);
             Array.Reverse(data);
             return BitConverter.ToUInt16(data, 0);
         }
 
-        public Int64 ReadInt64()
+        public override Int64 ReadInt64()
         {
             var data = base.ReadBytes(8);
             Array.Reverse(data);
             return BitConverter.ToInt64(data, 0);
         }
 
-        public UInt32 ReadUInt32()
+        public override UInt32 ReadUInt32()
         {
             var data = base.ReadBytes(4);
             Array.Reverse(data);

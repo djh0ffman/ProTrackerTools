@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace PTSerializer
+namespace ProTrackerTools
 {
     public class BigEndianWriter : BinaryWriter
     {
-        public BigEndianWriter(System.IO.Stream stream) : base(stream) { }
+        public BigEndianWriter(Stream stream) : base(stream) { }
         
         public void WriteAscii(string text, int length)
         {
@@ -29,8 +29,18 @@ namespace PTSerializer
         {
             var data = BitConverter.GetBytes(value);
             Array.Reverse(data);
-            this.Write(data[2]);
-            this.Write(data[3]);
-        }       
+            Write(data[2]);
+            Write(data[3]);
+        }      
+        
+        public byte[] ToArray()
+        {
+            return ((MemoryStream)BaseStream).ToArray();
+        }
+
+        public int Position
+        {
+            get { return (int)BaseStream.Position; }            
+        }
     }
 }

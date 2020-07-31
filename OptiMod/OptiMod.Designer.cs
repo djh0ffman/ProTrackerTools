@@ -51,11 +51,8 @@
             this.btnImportASCII = new System.Windows.Forms.Button();
             this.btnTruncateToLoop = new System.Windows.Forms.Button();
             this.btnExpandLoops = new System.Windows.Forms.Button();
-<<<<<<< HEAD
             this.btnPadSamples = new System.Windows.Forms.Button();
             this.txtPadSize = new System.Windows.Forms.TextBox();
-=======
->>>>>>> modexpand
             this.SuspendLayout();
             // 
             // btnOpen
@@ -279,22 +276,15 @@
             // btnExpandLoops
             // 
             this.btnExpandLoops.Enabled = false;
-<<<<<<< HEAD
             this.btnExpandLoops.Location = new System.Drawing.Point(691, 533);
             this.btnExpandLoops.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnExpandLoops.Name = "btnExpandLoops";
             this.btnExpandLoops.Size = new System.Drawing.Size(211, 28);
-=======
-            this.btnExpandLoops.Location = new System.Drawing.Point(518, 433);
-            this.btnExpandLoops.Name = "btnExpandLoops";
-            this.btnExpandLoops.Size = new System.Drawing.Size(158, 23);
->>>>>>> modexpand
             this.btnExpandLoops.TabIndex = 3;
             this.btnExpandLoops.Text = "Expand Pattern Loops";
             this.btnExpandLoops.UseVisualStyleBackColor = true;
             this.btnExpandLoops.Click += new System.EventHandler(this.btnExpandLoops_Click);
             // 
-<<<<<<< HEAD
             // btnPadSamples
             // 
             this.btnPadSamples.Enabled = false;
@@ -314,8 +304,6 @@
             this.txtPadSize.Size = new System.Drawing.Size(209, 22);
             this.txtPadSize.TabIndex = 5;
             // 
-=======
->>>>>>> modexpand
             // OptiMod
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -330,10 +318,7 @@
             this.Controls.Add(this.btnRemoveUnsedSamples);
             this.Controls.Add(this.btnRemoveUnusedPatterns);
             this.Controls.Add(this.btnImportASCII);
-<<<<<<< HEAD
             this.Controls.Add(this.btnPadSamples);
-=======
->>>>>>> modexpand
             this.Controls.Add(this.btnExpandLoops);
             this.Controls.Add(this.btnFullOptimse);
             this.Controls.Add(this.btnTruncateToLoop);
@@ -376,11 +361,9 @@
         private System.Windows.Forms.Button btnImportASCII;
         private System.Windows.Forms.Button btnTruncateToLoop;
         private System.Windows.Forms.Button btnExpandLoops;
-<<<<<<< HEAD
         private System.Windows.Forms.Button btnPadSamples;
         private System.Windows.Forms.TextBox txtPadSize;
-=======
->>>>>>> modexpand
+
     }
 }
 

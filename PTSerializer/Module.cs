@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PTSerializer
+namespace ProTrackerTools
 {
     public class Module
     {

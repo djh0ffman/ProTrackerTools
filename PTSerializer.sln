@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTSerializer", "PTSerializer\PTSerializer.csproj", "{9E347BB4-05D8-4A2D-98C3-10C11093D565}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProTrackerTools", "PTSerializer\ProTrackerTools.csproj", "{9E347BB4-05D8-4A2D-98C3-10C11093D565}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTSerializerTest", "PTSerializerTest\PTSerializerTest.csproj", "{FA54A5D2-49EA-4471-A7C0-48FCB6C74055}"
 EndProject
@@ -30,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD5B872A-A881-4A4A-A2F8-05DAD5169E91}
 	EndGlobalSection
 EndGlobal
