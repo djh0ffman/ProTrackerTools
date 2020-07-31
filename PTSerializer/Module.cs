@@ -44,6 +44,58 @@ namespace PTSerializer
         }
 
         /// <summary>
+        /// Made for Atari users, pads samples based on the size set
+        /// </summary>
+        /// <param name="SampleSize"></param>
+        public void PadSamples(int SampleSize)
+        {
+            for (var sIndex = 0; sIndex < Samples.Count(); sIndex++)
+            {
+                var s = Samples[sIndex];
+
+                if (s.Length > 2)
+                {
+                    var sample = new Sample()
+                    {
+                        Name = s.Name,
+                        Volume = s.Volume,
+                        FineTune = s.FineTune,
+                        RepeatStart = s.RepeatStart,
+                        RepeatLength = s.RepeatLength
+                    };
+
+                    var newLength = ((s.Length / SampleSize) * SampleSize) + SampleSize;
+                    sample.Length = newLength;
+
+                    var pos = 0;
+                    var repeatEnd = sample.RepeatStart + sample.RepeatLength;
+                    sample.Data = new byte[newLength];
+
+                    for (var i = 0; i < newLength; i++)
+                    {
+                        if (pos < s.Data.Length)
+                        {
+                            sample.Data[i] = s.Data[pos];       // copy byte
+                        }
+                        else
+                        {
+                            sample.Data[i] = 0x00;
+                        }
+
+                        pos++;                              // move to next byte
+
+                        if (sample.RepeatLength > 2 && pos == repeatEnd)                 // loop bounds check
+                        {
+                            pos = sample.RepeatStart;
+                        }
+                    }
+
+                    Samples[sIndex] = sample;
+                }
+            }
+        }
+
+        /// <summary>
         /// Removes any samples which have not been used in the pattern data
         /// </summary>
         public void RemoveUnusedSamples()
@@ -471,6 +523,11 @@ namespace PTSerializer
         public int RepeatStart { get; set; }
         public int RepeatLength { get; set; }
         public byte[] Data { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public class Pattern
