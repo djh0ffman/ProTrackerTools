@@ -408,7 +408,7 @@ namespace ProTrackerTools
                             }
                         }
 
-                        item.Command = CommandType.None;
+                        item.Command = CommandType.ArpNone;
                         item.CommandValue = 0;
                     }
                 }
@@ -456,7 +456,7 @@ namespace ProTrackerTools
                 foreach (var chan in dest.Channels)
                 {
                     var lineBreak = chan.PatternItems[newLineId - 1];
-                    if (lineBreak.Command == CommandType.None && lineBreak.CommandValue == 0x00)
+                    if (lineBreak.Command == CommandType.ArpNone && lineBreak.CommandValue == 0x00)
                     {
                         lineBreak.Command = CommandType.PatternBreak;
                         breakDone = true;
@@ -478,7 +478,7 @@ namespace ProTrackerTools
                         {
                             chan.PatternItems[i] = new PatternItem()
                             {
-                                Command = CommandType.None,
+                                Command = CommandType.ArpNone,
                                 CommandValue = 0x00,
                                 Period = 0,
                                 SampleNumber = 0
@@ -564,7 +564,7 @@ namespace ProTrackerTools
 
     public enum CommandType
     {
-        None = 0x00,
+        ArpNone = 0x00,
         SlideUp = 0x01,
         SlideDown = 0X02,
         TonePortamento = 0x03,

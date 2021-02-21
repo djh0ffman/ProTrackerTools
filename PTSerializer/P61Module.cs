@@ -16,9 +16,5 @@ namespace ProTrackerTools
     public class P61Pattern
     {
         public List<byte[]> Channels { get; set; } = new List<byte[]>();
-        public byte[] Channel1 { get; set; }
-        public byte[] Channel2 { get; set; }
-        public byte[] Channel3 { get; set; }
-        public byte[] Channel4 { get; set; }
     }
 }

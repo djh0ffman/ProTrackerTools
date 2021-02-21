@@ -48,5 +48,14 @@ namespace ProTrackerTools
             var data = base.ReadBytes(length);
             return Encoding.ASCII.GetString(data);
         }
+
+        public bool EndOfStream()
+        {
+            if (BaseStream.Position == BaseStream.Length)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

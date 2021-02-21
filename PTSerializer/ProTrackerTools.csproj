@@ -42,6 +42,7 @@
     <Compile Include="BigEndianReader.cs" />
     <Compile Include="BigEndianWriter.cs" />
     <Compile Include="Module.cs" />
+    <Compile Include="P61Command.cs" />
     <Compile Include="P61Convert.cs" />
     <Compile Include="P61Module.cs" />
     <Compile Include="Serializer.cs" />
