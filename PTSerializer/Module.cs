@@ -24,6 +24,26 @@ namespace ProTrackerTools
             Patterns = new List<Pattern>();
         }
 
+        public Pattern CreateNewPattern()
+        {
+            var pattern = new Pattern();
+
+            pattern.Channels = new Channel[4];
+
+            for (var c = 0; c < 4; c++)
+            {
+                var chan = new Channel();
+                chan.PatternItems = new PatternItem[64];
+                for (var l = 0; l < 64; l++)
+                {
+                    chan.PatternItems[l] = new PatternItem();
+                }
+                pattern.Channels[c] = chan;
+            }
+
+            return pattern;
+        }
+
         /// <summary>
         /// Removes unwanted data after the loop end point
         /// </summary>
