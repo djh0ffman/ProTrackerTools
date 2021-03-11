@@ -84,7 +84,8 @@ namespace ProTrackerTools
             return (item);
         }
 
-        public static byte[] SerializeMod(Module mod)
+        // serializes only the pattern data
+        public static byte[] SerializePatternData(Module mod)
         {
             var writer = new BigEndianWriter(new MemoryStream());
 
@@ -93,7 +94,7 @@ namespace ProTrackerTools
             foreach (var sample in mod.Samples)
             {
                 writer.WriteAscii(sample.Name, 22);
-                writer.WriteInt16(sample.Length/2);
+                writer.WriteInt16(sample.Length / 2);
                 writer.Write((sbyte)sample.FineTune);
                 writer.Write((byte)sample.Volume);
                 writer.WriteInt16(sample.RepeatStart / 2);
@@ -120,12 +121,34 @@ namespace ProTrackerTools
                 writer.Write(SerializePattern(mod.Patterns[p]));
             }
 
+            return writer.ToArray();
+        }
+
+        // serializes the samples
+        public static byte[] SerializeSampleData(Module mod)
+        {
+            var writer = new BigEndianWriter(new MemoryStream());
+
             foreach (var sample in mod.Samples)
             {
-                writer.Write(sample.Data);
+                if (sample.Length > 2)
+                    writer.Write(sample.Data);
             }
-            
-            return ((MemoryStream)writer.BaseStream).ToArray();
+
+            return writer.ToArray();
+        }
+
+        public static byte[] SerializeMod(Module mod)
+        {
+            var writer = new BigEndianWriter(new MemoryStream());
+
+            var patterns = SerializePatternData(mod);
+            var samples = SerializeSampleData(mod);
+
+            writer.Write(patterns);
+            writer.Write(samples);
+
+            return writer.ToArray();
         }
 
         private static byte[] SerializePattern(Pattern pattern)
