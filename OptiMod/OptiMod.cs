@@ -48,6 +48,7 @@ namespace OptiMod
                     btnTruncateToLoop.Enabled = true;
                     btnExpandLoops.Enabled = true;
                     btnPadSamples.Enabled = true;
+                    btnClearSampleNames.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -109,6 +110,40 @@ namespace OptiMod
             }
         }
 
+        private void SaveSong()
+        {
+            try
+            {
+                var sfd = new SaveFileDialog();
+                sfd.FileName = _fileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(sfd.FileName, Serializer.SerializePatternData(_mod));
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Whoops: {0}", e.Message));
+            }
+        }
+
+        private void SaveSamples()
+        {
+            try
+            {
+                var sfd = new SaveFileDialog();
+                sfd.FileName = _fileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(sfd.FileName, Serializer.SerializeSampleData(_mod));
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Whoops: {0}", e.Message));
+            }
+        }
+
         private void btnRemoveUnsedSamples_Click(object sender, EventArgs e)
         {
             _mod.RemoveUnusedSamples();
@@ -148,6 +183,8 @@ namespace OptiMod
             ImportASCII();
             RefreshDisplay();
         }
+
+
 
         private void ImportASCII()
         {
@@ -239,6 +276,22 @@ namespace OptiMod
                 _mod.PadSamples(sampleSize);
                 RefreshDisplay();
             }
+        }
+
+        private void btnClearSampleNames_Click(object sender, EventArgs e)
+        {
+            _mod.ClearSampleNames();
+            RefreshDisplay();
+        }
+
+        private void btnSaveSong_Click(object sender, EventArgs e)
+        {
+            SaveSong();
+        }
+
+        private void btnSaveSamples_Click(object sender, EventArgs e)
+        {
+            SaveSamples();
         }
     }
 }

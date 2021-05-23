@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ProTrackerTools
 {
@@ -139,7 +140,7 @@ namespace ProTrackerTools
                 if (!used[i])
                 {
                     Samples[i - 1].Data = new byte[2];
-                    Samples[i - 1].Length = 2;
+                    Samples[i - 1].Length = 0;
                     Samples[i - 1].RepeatStart = 0;
                     Samples[i - 1].RepeatLength = 2;
                     Samples[i - 1].FineTune = 0;
@@ -522,6 +523,14 @@ namespace ProTrackerTools
                 Command = source.Command,
                 CommandValue = source.CommandValue
             };
+        }
+
+        public void ClearSampleNames()
+        {
+            foreach (var sample in Samples)
+            {
+                sample.Name = Encoding.ASCII.GetString(new byte[22]);
+            }
         }
     }
 
