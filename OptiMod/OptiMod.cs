@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using PTSerializer;
+using ProTrackerTools;
 
 namespace OptiMod
 {
@@ -30,8 +30,7 @@ namespace OptiMod
                 ofd.Filter = "Protacker Module|*.mod;mod.*|All files (*.*)|*.*";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    var ser = new PTSerializer.PTSerializer();
-                    _mod = ser.DeSerializeMod(ofd.FileName);
+                    _mod = Serializer.DeSerializeMod(ofd.FileName);
                     lblName.Text = _mod.Name;
                     RefreshDisplay();
                     _fileName = Path.GetFileName(ofd.FileName);
@@ -49,6 +48,7 @@ namespace OptiMod
                     btnTruncateToLoop.Enabled = true;
                     btnExpandLoops.Enabled = true;
                     btnPadSamples.Enabled = true;
+                    btnClearSampleNames.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -66,8 +66,7 @@ namespace OptiMod
             }
 
             lblPatternsB.Text = string.Format("Patterns used: {0}", _mod.Patterns.Count);
-            var ser = new PTSerializer.PTSerializer();
-            var data = ser.SerializeMod(_mod);
+            var data = Serializer.SerializeMod(_mod);
             lblSizeB.Text = string.Format("Size: {0}", data.Length);
         }
 
@@ -102,8 +101,41 @@ namespace OptiMod
                 sfd.FileName = _fileName;
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    var ser = new PTSerializer.PTSerializer();
-                    File.WriteAllBytes(sfd.FileName, ser.SerializeMod(_mod));
+                    File.WriteAllBytes(sfd.FileName, Serializer.SerializeMod(_mod));
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Whoops: {0}", e.Message));
+            }
+        }
+
+        private void SaveSong()
+        {
+            try
+            {
+                var sfd = new SaveFileDialog();
+                sfd.FileName = _fileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(sfd.FileName, Serializer.SerializePatternData(_mod));
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Whoops: {0}", e.Message));
+            }
+        }
+
+        private void SaveSamples()
+        {
+            try
+            {
+                var sfd = new SaveFileDialog();
+                sfd.FileName = _fileName;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(sfd.FileName, Serializer.SerializeSampleData(_mod));
                 }
             }
             catch (Exception e)
@@ -151,6 +183,8 @@ namespace OptiMod
             ImportASCII();
             RefreshDisplay();
         }
+
+
 
         private void ImportASCII()
         {
@@ -242,6 +276,22 @@ namespace OptiMod
                 _mod.PadSamples(sampleSize);
                 RefreshDisplay();
             }
+        }
+
+        private void btnClearSampleNames_Click(object sender, EventArgs e)
+        {
+            _mod.ClearSampleNames();
+            RefreshDisplay();
+        }
+
+        private void btnSaveSong_Click(object sender, EventArgs e)
+        {
+            SaveSong();
+        }
+
+        private void btnSaveSamples_Click(object sender, EventArgs e)
+        {
+            SaveSamples();
         }
     }
 }

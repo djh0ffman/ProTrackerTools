@@ -1,6 +1,6 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
+using ProTrackerTools;
 
 namespace PTSerializerTest
 {
@@ -8,16 +8,9 @@ namespace PTSerializerTest
     {
         static void Main(string[] args)
         {
-            var ser = new PTSerializer.PTSerializer();
-            string fileName = "C:\\Users\\ian.ford\\Google Drive\\Amiga\\Mods\\mod.miles per pattern";
-            var original = File.ReadAllBytes(fileName);
-            var mod = ser.DeSerializeMod(fileName);
-            var data = ser.SerializeMod(mod);
-            if (original.Length != data.Length) throw new Exception("size is different");
-            for (var i = 0; i < original.Length; i++)
-            {
-                if (original[i] != data[i]) Console.WriteLine("Diff at {2} A: {0} B: {1}", original[i], data[i], i);
-            }
+            var mod = Serializer.DeSerializeMod("C:\\Users\\ianf\\Google Drive\\Amiga\\Mods\\Hoffman\\freerunner.mod");
+            var pmod = P61Convert.Convert(mod);
+            File.WriteAllBytes(@"C:\MyProjects\generator\Generator_asm\tunedata\samples\p61.myversion3", P61Convert.Serialize(pmod));
         }
     }
 }

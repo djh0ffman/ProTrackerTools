@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
-namespace PTSerializer
+namespace ProTrackerTools
 {
     public class Module
     {
@@ -22,6 +23,26 @@ namespace PTSerializer
                 Samples[i] = new Sample();
             }
             Patterns = new List<Pattern>();
+        }
+
+        public Pattern CreateNewPattern()
+        {
+            var pattern = new Pattern();
+
+            pattern.Channels = new Channel[4];
+
+            for (var c = 0; c < 4; c++)
+            {
+                var chan = new Channel();
+                chan.PatternItems = new PatternItem[64];
+                for (var l = 0; l < 64; l++)
+                {
+                    chan.PatternItems[l] = new PatternItem();
+                }
+                pattern.Channels[c] = chan;
+            }
+
+            return pattern;
         }
 
         /// <summary>
@@ -119,7 +140,7 @@ namespace PTSerializer
                 if (!used[i])
                 {
                     Samples[i - 1].Data = new byte[2];
-                    Samples[i - 1].Length = 2;
+                    Samples[i - 1].Length = 0;
                     Samples[i - 1].RepeatStart = 0;
                     Samples[i - 1].RepeatLength = 2;
                     Samples[i - 1].FineTune = 0;
@@ -408,7 +429,7 @@ namespace PTSerializer
                             }
                         }
 
-                        item.Command = CommandType.None;
+                        item.Command = CommandType.ArpNone;
                         item.CommandValue = 0;
                     }
                 }
@@ -456,7 +477,7 @@ namespace PTSerializer
                 foreach (var chan in dest.Channels)
                 {
                     var lineBreak = chan.PatternItems[newLineId - 1];
-                    if (lineBreak.Command == CommandType.None && lineBreak.CommandValue == 0x00)
+                    if (lineBreak.Command == CommandType.ArpNone && lineBreak.CommandValue == 0x00)
                     {
                         lineBreak.Command = CommandType.PatternBreak;
                         breakDone = true;
@@ -478,7 +499,7 @@ namespace PTSerializer
                         {
                             chan.PatternItems[i] = new PatternItem()
                             {
-                                Command = CommandType.None,
+                                Command = CommandType.ArpNone,
                                 CommandValue = 0x00,
                                 Period = 0,
                                 SampleNumber = 0
@@ -502,6 +523,14 @@ namespace PTSerializer
                 Command = source.Command,
                 CommandValue = source.CommandValue
             };
+        }
+
+        public void ClearSampleNames()
+        {
+            foreach (var sample in Samples)
+            {
+                sample.Name = Encoding.ASCII.GetString(new byte[22]);
+            }
         }
     }
 
@@ -564,7 +593,7 @@ namespace PTSerializer
 
     public enum CommandType
     {
-        None = 0x00,
+        ArpNone = 0x00,
         SlideUp = 0x01,
         SlideDown = 0X02,
         TonePortamento = 0x03,

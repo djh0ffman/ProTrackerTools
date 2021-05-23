@@ -78,9 +78,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PTSerializer\PTSerializer.csproj">
+    <ProjectReference Include="..\PTSerializer\ProTrackerTools.csproj">
       <Project>{9e347bb4-05d8-4a2d-98c3-10c11093d565}</Project>
-      <Name>PTSerializer</Name>
+      <Name>ProTrackerTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
