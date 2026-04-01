@@ -49,6 +49,11 @@ namespace OptiMod
                     btnExpandLoops.Enabled = true;
                     btnPadSamples.Enabled = true;
                     btnClearSampleNames.Enabled = true;
+                    buttonRemoveFilter.Enabled = true;
+                    btnClearChannel3.Enabled = true;
+                    btnSaveSamples.Enabled = true;
+                    btnSaveSong.Enabled = true;
+                    btnClearPatBreak.Enabled = true;
                 }
             }
             catch (Exception e)
@@ -158,11 +163,7 @@ namespace OptiMod
 
         private void btnFullOptimse_Click(object sender, EventArgs e)
         {
-            _mod.RemoveUnusedPatterns();
-            _mod.RemoveDuplicatePatterns();
-            _mod.RemoveUnusedSamples();
-            _mod.OptimseLoopedSamples();
-            _mod.ZeroLeadingSamples();
+            _mod.FullOptimise();
             RefreshDisplay();
         }
 
@@ -259,23 +260,49 @@ namespace OptiMod
             RefreshDisplay();
         }
 
-        private void btnPadSamples_Click(object sender, EventArgs e)
+        private void btnExportFour(object sender, EventArgs e)
         {
-            var sampleSize = 0;
-            try
+            var results = new List<byte[]>();
+
+            for (var chanid = 0; chanid < 4; chanid ++)
             {
-                sampleSize = Convert.ToInt32(txtPadSize.Text);
+                var mod = Serializer.DeSerializeMod(Serializer.SerializeMod(_mod));
+                foreach (var pattern in mod.Patterns)
+                {
+                    for (var i = 0; i < 4; i++)
+                    {
+                        if (i == chanid)
+                        {
+                            continue;
+                        }
+                        
+                        foreach (var patitem in pattern.Channels[i].PatternItems)
+                        {
+                            if (patitem.Command != CommandType.SetSpeed)
+                            {
+                                patitem.CommandValue = 0;
+                                patitem.Command = 0;
+                            }
+                            patitem.SampleNumber = 0;
+                            patitem.Period = 0;
+                        }
+                    }
+                }
+                
+                results.Add(Serializer.SerializeMod(mod));
             }
-            catch
+            var ofd = new FolderBrowserDialog();
+            if (ofd.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show(string.Format("{0} isn't a number", txtPadSize.Text));
+                var folder = ofd.SelectedPath;
+                var modid = 0;
+                foreach (var modbin in results)
+                {
+                    File.WriteAllBytes(Path.Combine(folder, $"{modid}.mod"), modbin);
+                    modid++;
+                }
             }
 
-            if (sampleSize > 4)
-            {
-                _mod.PadSamples(sampleSize);
-                RefreshDisplay();
-            }
         }
 
         private void btnClearSampleNames_Click(object sender, EventArgs e)
@@ -292,6 +319,106 @@ namespace OptiMod
         private void btnSaveSamples_Click(object sender, EventArgs e)
         {
             SaveSamples();
+        }
+
+        private void buttonRemoveFilter_Click(object sender, EventArgs e)
+        {
+            foreach (var pattern in _mod.Patterns)
+            {
+                foreach (var chan in pattern.Channels)
+                {
+                    foreach (var item in chan.PatternItems)
+                    {
+                        if (item.Command == CommandType.Extended && (item.CommandValue & 0xf0) == 0)
+                        {
+                            item.Command = CommandType.ArpNone;
+                            item.CommandValue = 0x00;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private void btnClearChannel3_Click(object sender, EventArgs e)
+        {
+            _mod.ClearChannel(3);
+        }
+
+        private void btnClearPatBreak_Click(object sender, EventArgs e)
+        {
+            _mod.CleanAfterPatternBreaks(); 
+        }
+
+        private void btnStackSamples_Click(object sender, EventArgs e)
+        {
+            StackSamples();
+        }
+
+        private void StackSamples()
+        {
+            var sampleIdFrom = Convert.ToInt32(txtStackFrom.Text);
+            var sampleIdTo = Convert.ToInt32(txtStackTo.Text);
+
+            var sampleFrom = _mod.Samples[sampleIdFrom - 1];
+            var sampleTo = _mod.Samples[sampleIdTo - 1];
+
+            // prep new sample
+            var sampleData = sampleTo.Data.ToList();
+            var remain = 256 - (sampleData.Count % 256);
+            sampleData.AddRange(new byte[remain]);
+            var posOffset = sampleData.Count / 256;
+            sampleData.AddRange(sampleFrom.Data);
+            sampleTo.Data = sampleData.ToArray();
+            sampleTo.Length = sampleData.Count;
+
+            var newName = sampleTo.Name.Replace("\0", "");
+            newName += $"{posOffset}";
+            if (newName.Length > 20)
+            {
+                newName = newName.Substring(newName.Length - 20, 20);
+            }
+            sampleTo.Name = newName;
+
+
+            // clean old sample
+            sampleFrom.Data = new byte[0];
+            sampleFrom.Length = 0;
+            sampleFrom.Name = "----";
+
+
+            foreach (var pat in _mod.Patterns)
+            {
+                foreach (var chan in pat.Channels)
+                {
+                    foreach (var item in chan.PatternItems)
+                    {
+                        if (item.SampleNumber == sampleIdFrom)
+                        {
+                            if (item.Command == CommandType.SampleOffset)
+                            {
+                                item.SampleNumber = sampleIdTo;
+                                item.CommandValue = (byte)(item.CommandValue + posOffset); 
+                            }
+                            else if (item.Command == CommandType.ArpNone && item.CommandValue == 0)
+                            {
+                                item.SampleNumber = sampleIdTo;
+                                item.Command = CommandType.SampleOffset;
+                                item.CommandValue = (byte)posOffset;
+
+                            }
+                            else
+                            {
+                                MessageBox.Show("SHIT!");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
         }
     }
 }

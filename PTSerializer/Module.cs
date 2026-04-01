@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -164,6 +165,133 @@ namespace ProTrackerTools
         }
 
         /// <summary>
+        /// Reorders patterns in a more sequential order
+        /// </summary>
+        public void ReorderPatterns()
+        {
+            var newPatterns = new List<Pattern>();
+            var newSongPos = new int[128];
+
+            for (var songPosId = 0; songPosId < SongLength; songPosId++)
+            {
+                var patId = SongPositions[songPosId];
+                var thisPat = Patterns[patId];
+                if (!newPatterns.Contains(thisPat))
+                {
+                    newPatterns.Add(thisPat);
+                }
+                newSongPos[songPosId] = newPatterns.IndexOf(thisPat);
+            }
+            SongPositions = newSongPos;
+            Patterns = newPatterns;
+        }
+
+        /// <summary>
+        /// reorders samples in order of appearance, leaving unused at the end
+        /// </summary>
+        public void ReorderSamples()
+        {
+            var newSamples = new List<Sample>();
+
+            // first add samples to list in order of appearance
+            for (var songPosId = 0; songPosId < SongLength; songPosId++)
+            {
+                var patId = SongPositions[songPosId];
+                var thisPat = Patterns[patId];
+                for (var lineId = 0; lineId < 64; lineId++)
+                {
+                    foreach (var chan in thisPat.Channels)
+                    {
+                        var cell = chan.PatternItems[lineId];
+                        var sampleId = cell.SampleNumber - 1;
+                        if (sampleId >= 0)
+                        {
+                            var thisSample = Samples[sampleId];
+                            if (!newSamples.Contains(thisSample))
+                            {
+                                newSamples.Add(thisSample);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // now remap the patterns
+            foreach (var pat in Patterns)
+            {
+                for (var lineId = 0; lineId < 64; lineId++)
+                {
+                    foreach (var chan in pat.Channels)
+                    {
+                        var cell = chan.PatternItems[lineId];
+                        var sampleId = cell.SampleNumber - 1;
+                        if (sampleId >= 0)
+                        {
+                            var thisSample = Samples[sampleId];
+                            var newSampleId = newSamples.IndexOf(thisSample) + 1;
+                            cell.SampleNumber = newSampleId;
+                        }
+                    }
+                }
+            }
+
+            var remaining = 31 - newSamples.Count;
+            while (remaining > 0)
+            {
+                newSamples.Add(new Sample());
+                remaining--;
+            }
+
+            Samples = newSamples.ToArray();
+        }
+
+        public void CleanAfterPatternBreaks()
+        {
+            foreach (var pat in Patterns)
+            {
+                var patBreak = FindFirstPattterBreak(pat);
+                if (patBreak > 0)
+                {
+                    for (var i = patBreak + 1; i < 64; i++)
+                    {
+                        foreach (var chan in pat.Channels)
+                        {
+                            chan.PatternItems[i] = new PatternItem();
+                        }
+                    }
+                }
+            }
+        }
+
+        public int FindFirstPattterBreak(Pattern pat)
+        {
+            for (var i = 0; i < 64; i++)
+            {
+                foreach (var chan in pat.Channels)
+                {
+                    if (chan.PatternItems[i].Command == CommandType.PatternBreak
+                        || chan.PatternItems[i].Command == CommandType.PositionJump)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        public void FullOptimise()
+        {
+            RemoveUnusedPatterns();
+            RemoveDuplicatePatterns();
+            RemoveUnusedSamples();
+            OptimseLoopedSamples();
+            ZeroLeadingSamples();
+            ReorderPatterns();
+            //ReorderSamples();
+        }
+
+        /// <summary>
         /// Clears patterns after song end point and removes and sanitizes the remaining patterns
         /// </summary>
         public void RemoveUnusedPatterns()
@@ -239,7 +367,7 @@ namespace ProTrackerTools
             SanitizePatterns();
         }
 
-        private bool PatternCompare(Pattern a, Pattern b)
+        public static bool PatternCompare(Pattern a, Pattern b)
         {
             for (var line = 0; line < 64; line++)
             {
@@ -532,6 +660,231 @@ namespace ProTrackerTools
                 sample.Name = Encoding.ASCII.GetString(new byte[22]);
             }
         }
+
+        public void ClearChannel(int channelId = 3)
+        {
+            foreach (var pattern in Patterns)
+            {
+                foreach (var item in pattern.Channels[3].PatternItems)
+                {
+                    item.SampleNumber = 0;
+                    item.Period = 0;
+                    switch (item.Command)
+                    {
+                        case CommandType.PatternBreak:
+                        case CommandType.PositionJump:
+                        case CommandType.SetSpeed:
+                            break;
+                        default:
+                            item.Command = CommandType.ArpNone;
+                            item.CommandValue = 0;
+                            break;
+                        case CommandType.Extended:
+                            switch (item.CommandValue & 0xf0)
+                            {
+                                case 0x60:
+                                    break;
+                                default:
+                                    item.Command = CommandType.ArpNone;
+                                    item.CommandValue = 0;
+                                    break;
+                            }
+                            break;
+                    };
+                }
+            }
+        }
+
+        private void CalcSideChainValues(SideChain sideChain)
+        {
+            foreach (var duck in sideChain.DuckSamples)
+            {
+                var originalVolume = Samples[duck.SampleNumber - 1].Volume;
+                var reduction = (int)(originalVolume * duck.Reduction);
+                var perLine = reduction / duck.Lines / 2;
+                var remainder = (reduction - (perLine * duck.Lines * 2)) / 2;
+
+                duck.VolumeValues = new List<int>();
+                for (var i = 0; i < duck.Lines; i++)
+                {
+                    if (i == duck.Lines - 1)
+                    {
+                        duck.VolumeValues.Add(perLine + remainder);
+                    }
+                    else
+                    {
+                        duck.VolumeValues.Add(perLine);
+                    }
+                }
+
+                var destVolume = originalVolume - (perLine * duck.Lines) + remainder;
+            }
+        }
+
+        public void ApplySideChain(SideChain sideChain)
+        {
+            CalcSideChainValues(sideChain);
+
+            var channels = new ChannelChainStatus[4];
+            channels[0] = new ChannelChainStatus();
+            channels[1] = new ChannelChainStatus();
+            channels[2] = new ChannelChainStatus();
+            channels[3] = new ChannelChainStatus();
+
+            foreach (var patternId in SongPositions)
+            {
+                var pattern = Patterns[patternId];
+
+                for (int lineId = 0; lineId < 64; lineId++)
+                {
+                    // load samples into channels
+                    for (var chan = 0; chan < 4; chan++)
+                    {
+                        var sampleNumber = pattern.Channels[chan].PatternItems[lineId].SampleNumber;
+                        if (sampleNumber > 0)
+                        {
+                            channels[chan].SampleNumer = sampleNumber;
+                        }
+
+                        if (pattern.Channels[chan].PatternItems[lineId].Command == CommandType.SetVolume)
+                        {
+                            channels[chan].SampleNumer = 0;
+                        }
+                    }
+
+                    bool lineTriggered = DuckTriggered(pattern, lineId, sideChain);
+
+
+                    // line triggered side chain..  active side chains
+                    for (var chan = 0; chan < 4; chan++)
+                    {
+                        var thisChan = pattern.Channels[chan].PatternItems[lineId];
+
+                        if (chan == sideChain.DrumChannel)
+                        {
+                            continue;
+                        }
+                        int sampleNumber = channels[chan].SampleNumer;
+                        if (sampleNumber <= 0)
+                        {
+                            continue;
+                        }
+
+                        var duck = sideChain.DuckSamples.Where(d => d.SampleNumber == sampleNumber).FirstOrDefault();
+                        if (duck == null)
+                        {
+                            continue;
+                        }
+
+                        if (lineTriggered)
+                        {
+                            channels[chan].ChainActive = true;
+                            channels[chan].Delay = duck.Delay;
+                            channels[chan].ActiveCount = 0;
+                            channels[chan].Duck = duck;
+                        }
+                        else
+                        {
+                            if (thisChan.Period != 0)
+                            {
+                                thisChan.Command = CommandType.SetVolume;
+                                channels[chan].Triggered = false;
+                                var originalVolume = Samples[duck.SampleNumber - 1].Volume;
+                            }
+                        }
+                    }
+
+                    // apply side chain
+                    for (var chan = 0; chan < 4; chan++)
+                    {
+                        if (channels[chan].ChainActive)
+                        {
+                            var thisChan = pattern.Channels[chan].PatternItems[lineId];
+
+                            if (channels[chan].Triggered)
+                            {
+                                thisChan.SampleNumber = channels[chan].SampleNumer;
+                                channels[chan].Triggered = false;
+                            }
+
+                            if (channels[chan].Delay > 0)
+                            {
+                                channels[chan].Delay--;
+                                continue;
+                            }
+
+                            var requiredCommand = CommandType.ArpNone;
+
+                            switch (thisChan.Command)
+                            {
+                                case CommandType.ArpNone:
+                                    requiredCommand = CommandType.VolumeSlide;
+                                    break;
+                                case CommandType.TonePortamento:
+                                    requiredCommand = CommandType.TonePortamentoVolumeSlide;
+                                    break;
+                                case CommandType.Vibrato:
+                                    requiredCommand = CommandType.VibratoVolumeSlide;
+                                    break;
+                                default:
+                                    throw new Exception($"SHIT!");
+                            }
+
+                            thisChan.Command = requiredCommand;
+
+                            thisChan.CommandValue = (byte)(channels[chan].Duck.VolumeValues[channels[chan].ActiveCount] << 4);
+
+                            channels[chan].ActiveCount++;
+                            if (channels[chan].ActiveCount == channels[chan].Duck.Lines)
+                            {
+                                channels[chan].ChainActive = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // everything else done, change the sample volumes
+            foreach (var duck in sideChain.DuckSamples)
+            {
+                Samples[duck.SampleNumber - 1].Volume = duck.NewVolume;
+            }
+        }
+
+        public bool DuckTriggered(Pattern pattern, int lineId, SideChain sideChain)
+        {
+            var source = pattern.Channels[sideChain.DrumChannel].PatternItems[lineId];
+
+            foreach (var trigger in sideChain.Triggers)
+            {
+                if (trigger.SampleNumber != source.SampleNumber)
+                {
+                    continue;
+                }
+
+                var offset = 0;
+                if (source.Command == CommandType.SampleOffset)
+                {
+                    offset = source.CommandValue;
+                }
+
+                if (trigger.OffsetValue == offset)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    class ChannelChainStatus
+    {
+        public int SampleNumer { get; set; } = 0;
+        public int ActiveCount { get; set; } = 0;
+        public int Delay { get; set; } = 0;
+        public bool ChainActive { get; set; } = false;
+        public ChainDuck Duck { get; set; }
+        public bool Triggered { get; set; } = false;
     }
 
     class PatternLoop
@@ -552,10 +905,19 @@ namespace ProTrackerTools
         public int RepeatStart { get; set; }
         public int RepeatLength { get; set; }
         public byte[] Data { get; set; }
+        public byte[] Packed { get; set; }
+        public byte[] DeltaPacked { get; set; }
 
         public override string ToString()
         {
             return Name;
+        }
+
+        public Sample()
+        {
+            Length = 2;
+            RepeatLength = 2;
+            Name = "";
         }
     }
 
@@ -570,6 +932,43 @@ namespace ProTrackerTools
             Channels[1] = new Channel();
             Channels[2] = new Channel();
             Channels[3] = new Channel();
+        }
+
+        public Pattern Clone()
+        {
+            var newPattern = CreateNewPattern();
+            for (var c = 0; c < 4; c++)
+            {
+                for (var i = 0; i < 64; i++)
+                {
+                    newPattern.Channels[c].PatternItems[i].SampleNumber = Channels[c].PatternItems[i].SampleNumber;
+                    newPattern.Channels[c].PatternItems[i].Period = Channels[c].PatternItems[i].Period;
+                    newPattern.Channels[c].PatternItems[i].Command = Channels[c].PatternItems[i].Command;
+                    newPattern.Channels[c].PatternItems[i].CommandValue = Channels[c].PatternItems[i].CommandValue;
+                }
+            }
+            
+            return newPattern;
+        }
+
+        public Pattern CreateNewPattern()
+        {
+            var pattern = new Pattern();
+
+            pattern.Channels = new Channel[4];
+
+            for (var c = 0; c < 4; c++)
+            {
+                var chan = new Channel();
+                chan.PatternItems = new PatternItem[64];
+                for (var l = 0; l < 64; l++)
+                {
+                    chan.PatternItems[l] = new PatternItem();
+                }
+                pattern.Channels[c] = chan;
+            }
+
+            return pattern;
         }
     }
     

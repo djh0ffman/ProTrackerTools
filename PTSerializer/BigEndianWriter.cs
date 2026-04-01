@@ -31,8 +31,17 @@ namespace ProTrackerTools
             Array.Reverse(data);
             Write(data[2]);
             Write(data[3]);
-        }      
-        
+        }
+
+        public void WriteUInt32(UInt32 value)
+        {
+            var data = BitConverter.GetBytes(value);
+            Array.Reverse(data);
+            Write(data[0]);
+            Write(data[1]);
+            Write(data[2]);
+            Write(data[3]);
+        }
         public byte[] ToArray()
         {
             return ((MemoryStream)BaseStream).ToArray();

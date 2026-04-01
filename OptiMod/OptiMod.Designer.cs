@@ -52,10 +52,17 @@
             this.btnTruncateToLoop = new System.Windows.Forms.Button();
             this.btnExpandLoops = new System.Windows.Forms.Button();
             this.btnPadSamples = new System.Windows.Forms.Button();
-            this.txtPadSize = new System.Windows.Forms.TextBox();
             this.btnClearSampleNames = new System.Windows.Forms.Button();
             this.btnSaveSong = new System.Windows.Forms.Button();
             this.btnSaveSamples = new System.Windows.Forms.Button();
+            this.buttonRemoveFilter = new System.Windows.Forms.Button();
+            this.btnClearChannel3 = new System.Windows.Forms.Button();
+            this.btnClearPatBreak = new System.Windows.Forms.Button();
+            this.txtStackFrom = new System.Windows.Forms.TextBox();
+            this.txtStackTo = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btnStackSamples = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOpen
@@ -263,7 +270,7 @@
             // btnExpandLoops
             // 
             this.btnExpandLoops.Enabled = false;
-            this.btnExpandLoops.Location = new System.Drawing.Point(518, 433);
+            this.btnExpandLoops.Location = new System.Drawing.Point(518, 452);
             this.btnExpandLoops.Name = "btnExpandLoops";
             this.btnExpandLoops.Size = new System.Drawing.Size(158, 23);
             this.btnExpandLoops.TabIndex = 3;
@@ -274,21 +281,13 @@
             // btnPadSamples
             // 
             this.btnPadSamples.Enabled = false;
-            this.btnPadSamples.Location = new System.Drawing.Point(518, 506);
+            this.btnPadSamples.Location = new System.Drawing.Point(518, 545);
             this.btnPadSamples.Name = "btnPadSamples";
             this.btnPadSamples.Size = new System.Drawing.Size(158, 23);
             this.btnPadSamples.TabIndex = 3;
-            this.btnPadSamples.Text = "Pad Samples";
+            this.btnPadSamples.Text = "Export Channel Mods";
             this.btnPadSamples.UseVisualStyleBackColor = true;
-            this.btnPadSamples.Click += new System.EventHandler(this.btnPadSamples_Click);
-            // 
-            // txtPadSize
-            // 
-            this.txtPadSize.Location = new System.Drawing.Point(518, 535);
-            this.txtPadSize.Margin = new System.Windows.Forms.Padding(2);
-            this.txtPadSize.Name = "txtPadSize";
-            this.txtPadSize.Size = new System.Drawing.Size(158, 20);
-            this.txtPadSize.TabIndex = 5;
+            this.btnPadSamples.Click += new System.EventHandler(this.btnExportFour);
             // 
             // btnClearSampleNames
             // 
@@ -323,12 +322,94 @@
             this.btnSaveSamples.UseVisualStyleBackColor = true;
             this.btnSaveSamples.Click += new System.EventHandler(this.btnSaveSamples_Click);
             // 
+            // buttonRemoveFilter
+            // 
+            this.buttonRemoveFilter.Enabled = false;
+            this.buttonRemoveFilter.Location = new System.Drawing.Point(517, 617);
+            this.buttonRemoveFilter.Name = "buttonRemoveFilter";
+            this.buttonRemoveFilter.Size = new System.Drawing.Size(158, 23);
+            this.buttonRemoveFilter.TabIndex = 6;
+            this.buttonRemoveFilter.Text = "Remove Filter Commands";
+            this.buttonRemoveFilter.UseVisualStyleBackColor = true;
+            this.buttonRemoveFilter.Click += new System.EventHandler(this.buttonRemoveFilter_Click);
+            // 
+            // btnClearChannel3
+            // 
+            this.btnClearChannel3.Enabled = false;
+            this.btnClearChannel3.Location = new System.Drawing.Point(518, 481);
+            this.btnClearChannel3.Name = "btnClearChannel3";
+            this.btnClearChannel3.Size = new System.Drawing.Size(158, 23);
+            this.btnClearChannel3.TabIndex = 7;
+            this.btnClearChannel3.Text = "Clear Channel 3";
+            this.btnClearChannel3.UseVisualStyleBackColor = true;
+            this.btnClearChannel3.Click += new System.EventHandler(this.btnClearChannel3_Click);
+            // 
+            // btnClearPatBreak
+            // 
+            this.btnClearPatBreak.Enabled = false;
+            this.btnClearPatBreak.Location = new System.Drawing.Point(517, 409);
+            this.btnClearPatBreak.Name = "btnClearPatBreak";
+            this.btnClearPatBreak.Size = new System.Drawing.Size(158, 23);
+            this.btnClearPatBreak.TabIndex = 8;
+            this.btnClearPatBreak.Text = "Clear After Pat Break";
+            this.btnClearPatBreak.UseVisualStyleBackColor = true;
+            this.btnClearPatBreak.Click += new System.EventHandler(this.btnClearPatBreak_Click);
+            // 
+            // txtStackFrom
+            // 
+            this.txtStackFrom.Location = new System.Drawing.Point(340, 14);
+            this.txtStackFrom.Name = "txtStackFrom";
+            this.txtStackFrom.Size = new System.Drawing.Size(100, 20);
+            this.txtStackFrom.TabIndex = 9;
+            // 
+            // txtStackTo
+            // 
+            this.txtStackTo.Location = new System.Drawing.Point(340, 48);
+            this.txtStackTo.Name = "txtStackTo";
+            this.txtStackTo.Size = new System.Drawing.Size(100, 20);
+            this.txtStackTo.TabIndex = 9;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(258, 17);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(76, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Stack From ($)";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(268, 51);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(66, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Stack To ($)";
+            // 
+            // btnStackSamples
+            // 
+            this.btnStackSamples.Location = new System.Drawing.Point(446, 18);
+            this.btnStackSamples.Name = "btnStackSamples";
+            this.btnStackSamples.Size = new System.Drawing.Size(25, 50);
+            this.btnStackSamples.TabIndex = 11;
+            this.btnStackSamples.Text = "GO";
+            this.btnStackSamples.UseVisualStyleBackColor = true;
+            this.btnStackSamples.Click += new System.EventHandler(this.btnStackSamples_Click);
+            // 
             // OptiMod
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 652);
-            this.Controls.Add(this.txtPadSize);
+            this.Controls.Add(this.btnStackSamples);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.txtStackTo);
+            this.Controls.Add(this.txtStackFrom);
+            this.Controls.Add(this.btnClearPatBreak);
+            this.Controls.Add(this.btnClearChannel3);
+            this.Controls.Add(this.buttonRemoveFilter);
             this.Controls.Add(this.lblSizeB);
             this.Controls.Add(this.lblSizeA);
             this.Controls.Add(this.lblPatternsB);
@@ -383,10 +464,17 @@
         private System.Windows.Forms.Button btnTruncateToLoop;
         private System.Windows.Forms.Button btnExpandLoops;
         private System.Windows.Forms.Button btnPadSamples;
-        private System.Windows.Forms.TextBox txtPadSize;
         private System.Windows.Forms.Button btnClearSampleNames;
         private System.Windows.Forms.Button btnSaveSong;
         private System.Windows.Forms.Button btnSaveSamples;
+        private System.Windows.Forms.Button buttonRemoveFilter;
+        private System.Windows.Forms.Button btnClearChannel3;
+        private System.Windows.Forms.Button btnClearPatBreak;
+        private System.Windows.Forms.TextBox txtStackFrom;
+        private System.Windows.Forms.TextBox txtStackTo;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnStackSamples;
     }
 }
 
